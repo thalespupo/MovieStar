@@ -1,4 +1,6 @@
-package com.tapura.moviestar.main;
+package com.tapura.moviestar.api;
+
+import com.tapura.moviestar.api.MoviesAPIService;
 
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;

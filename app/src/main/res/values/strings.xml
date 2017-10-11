@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">MovieStar</string>
+    <string name="action_settings">Settings</string>
+    <string name="menu_popular_title">Popular</string>
+    <string name="menu_highest_rated_title">Highest-rated</string>
+    <string name="title_activity_movie_details">MovieDetailsActivity</string>
 </resources>

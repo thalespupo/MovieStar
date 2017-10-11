@@ -1,4 +1,4 @@
-package com.tapura.moviestar.main;
+package com.tapura.moviestar.api;
 
 import com.tapura.moviestar.model.MoviesBySortResponse;
 
