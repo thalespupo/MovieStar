@@ -17,31 +17,28 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@{movie.originalTitle}"/>
+            android:text="@{movie.originalTitle}" />
+
+        <!-- <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:???="@{movie.posterPath}"
+            /> -->
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@{movie.posterPath}"/>
+            android:text="@{movie.overview}" />
+
+        <RatingBar
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:numStars="5"
+            android:rating="@{movie.getVoteAverageFloat}" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@{movie.overview}"/>
-
-        <!--<RatingBar
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:numStars="10"
-            android:rating="@{movie.voteAverage}"/> -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@{Double.toString(movie.voteAverage)}"/>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@{movie.releaseDate}"/>
+            android:text="@{movie.releaseDate}" />
     </LinearLayout>
 </layout>

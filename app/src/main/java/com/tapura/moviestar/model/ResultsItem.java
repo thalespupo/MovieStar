@@ -131,6 +131,10 @@ public class ResultsItem {
         return voteAverage;
     }
 
+    public float getVoteAverageFloat() {
+        return (float) voteAverage/2;
+    }
+
     public void setPopularity(double popularity) {
         this.popularity = popularity;
     }

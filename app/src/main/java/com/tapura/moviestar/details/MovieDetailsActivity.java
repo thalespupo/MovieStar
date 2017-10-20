@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.widget.RatingBar;
 import android.widget.TextView;
 
 import com.tapura.moviestar.R;
@@ -23,8 +24,10 @@ public class MovieDetailsActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         ResultsItem movie = Parcels.unwrap(intent.getParcelableExtra(KEY_MOVIE));
+        setTitle(movie.getTitle());
 
         binding.setMovie(movie);
+
 
 
     }
