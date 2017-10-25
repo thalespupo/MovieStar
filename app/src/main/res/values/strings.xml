@@ -4,4 +4,9 @@
     <string name="menu_popular_title">Popular</string>
     <string name="menu_highest_rated_title">Highest-rated</string>
     <string name="title_activity_movie_details">MovieDetailsActivity</string>
+    <string name="label_original_name">Original name:</string>
+    <string name="label_overview">Overview:</string>
+    <string name="label_rating">Rating:</string>
+    <string name="label_release_date">"Release date: "</string>
+    <string name="desc_movie_poster">Movie poster</string>
 </resources>

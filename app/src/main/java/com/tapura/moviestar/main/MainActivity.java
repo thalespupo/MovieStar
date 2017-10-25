@@ -30,7 +30,7 @@ import retrofit2.Response;
 import static com.tapura.moviestar.Constants.APP_TAG;
 import static com.tapura.moviestar.Constants.KEY_MOVIE;
 
-public class MainActivity extends AppCompatActivity implements Callback<MoviesBySortResponse>,MovieAdapter.MovieAdapterOnClickHandler {
+public class MainActivity extends AppCompatActivity implements Callback<MoviesBySortResponse>, MovieAdapter.MovieAdapterOnClickHandler {
     private static final String CLASS_TAG = MainActivity.class.getSimpleName() + ":: ";
 
     private static final String KEY_SORT = "sort";
@@ -55,7 +55,9 @@ public class MainActivity extends AppCompatActivity implements Callback<MoviesBy
         mMoviesGrid = findViewById(R.id.rv_movies_grid);
 
         GridLayoutManager layoutManager;
-        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+
+        boolean isLandscape = getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE;
+        if (isLandscape) {
             layoutManager = new GridLayoutManager(this, 3);
         } else {
             layoutManager = new GridLayoutManager(this, 2);

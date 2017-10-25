@@ -112,7 +112,7 @@ public class ResultsItem {
     }
 
     public String getBackdropPath() {
-        return "https://image.tmdb.org/t/p/w500" + backdropPath;
+        return "https://image.tmdb.org/t/p/w1000" + backdropPath;
     }
 
     public void setReleaseDate(String releaseDate) {
@@ -132,7 +132,7 @@ public class ResultsItem {
     }
 
     public float getVoteAverageFloat() {
-        return (float) voteAverage/2;
+        return (float) voteAverage / 2;
     }
 
     public void setPopularity(double popularity) {

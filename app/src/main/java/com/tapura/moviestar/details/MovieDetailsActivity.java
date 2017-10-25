@@ -4,9 +4,9 @@ import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.widget.RatingBar;
-import android.widget.TextView;
+import android.widget.ImageView;
 
+import com.squareup.picasso.Picasso;
 import com.tapura.moviestar.R;
 import com.tapura.moviestar.databinding.ActivityMovieDetailsBinding;
 import com.tapura.moviestar.model.ResultsItem;
@@ -28,8 +28,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
 
         binding.setMovie(movie);
 
-
-
+        ImageView iv = findViewById(R.id.imageview_movie_posterpath);
+        Picasso.with(this).load(movie.getBackdropPath()).into(iv);
     }
-
 }
