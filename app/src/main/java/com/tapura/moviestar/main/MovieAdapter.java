@@ -9,7 +9,7 @@ import android.widget.ImageView;
 
 import com.squareup.picasso.Picasso;
 import com.tapura.moviestar.R;
-import com.tapura.moviestar.model.ResultsItem;
+import com.tapura.moviestar.model.ResultsItemMoviesBySort;
 
 import java.util.List;
 
@@ -18,7 +18,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapterViewHolder> {
     private static final String CLASS_TAG = MovieAdapter.class.getSimpleName() + ":: ";
 
-    private List<ResultsItem> mMovieData;
+    private List<ResultsItemMoviesBySort> mMovieData;
     private Context mContext;
     private MovieAdapterOnClickHandler mCallBack;
 
@@ -31,7 +31,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
         mCallBack = callBack;
     }
 
-    public void setMovieList(List<ResultsItem> movieList) {
+    public void setMovieList(List<ResultsItemMoviesBySort> movieList) {
         this.mMovieData = checkNotNull(movieList);
         this.notifyDataSetChanged();
     }
@@ -65,7 +65,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
 
     @Override
     public void onBindViewHolder(MovieAdapterViewHolder holder, int position) {
-        ResultsItem movie = mMovieData.get(position);
+        ResultsItemMoviesBySort movie = mMovieData.get(position);
         Picasso.with(mContext).load(movie.getPosterPath()).placeholder(R.drawable.movie_poster_placeholder).into(holder.mMovieImageView);
     }
 

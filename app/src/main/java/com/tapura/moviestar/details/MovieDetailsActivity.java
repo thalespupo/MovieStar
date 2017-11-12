@@ -9,7 +9,7 @@ import android.widget.ImageView;
 import com.squareup.picasso.Picasso;
 import com.tapura.moviestar.R;
 import com.tapura.moviestar.databinding.ActivityMovieDetailsBinding;
-import com.tapura.moviestar.model.ResultsItem;
+import com.tapura.moviestar.model.ResultsItemMoviesBySort;
 
 import org.parceler.Parcels;
 
@@ -23,7 +23,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
         ActivityMovieDetailsBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_movie_details);
 
         Intent intent = getIntent();
-        ResultsItem movie = Parcels.unwrap(intent.getParcelableExtra(KEY_MOVIE));
+        ResultsItemMoviesBySort movie = Parcels.unwrap(intent.getParcelableExtra(KEY_MOVIE));
         setTitle(movie.getTitle());
 
         binding.setMovie(movie);

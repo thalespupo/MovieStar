@@ -15,8 +15,8 @@ import com.tapura.moviestar.R;
 import com.tapura.moviestar.api.MoviesAPIService;
 import com.tapura.moviestar.api.MoviesAPIServiceBuilder;
 import com.tapura.moviestar.details.MovieDetailsActivity;
-import com.tapura.moviestar.model.MoviesBySortResponse;
-import com.tapura.moviestar.model.ResultsItem;
+import com.tapura.moviestar.model.ResponseMoviesBySort;
+import com.tapura.moviestar.model.ResultsItemMoviesBySort;
 
 import org.parceler.Parcels;
 
@@ -30,7 +30,7 @@ import retrofit2.Response;
 import static com.tapura.moviestar.Constants.APP_TAG;
 import static com.tapura.moviestar.Constants.KEY_MOVIE;
 
-public class MainActivity extends AppCompatActivity implements Callback<MoviesBySortResponse>, MovieAdapter.MovieAdapterOnClickHandler {
+public class MainActivity extends AppCompatActivity implements Callback<ResponseMoviesBySort>, MovieAdapter.MovieAdapterOnClickHandler {
     private static final String CLASS_TAG = MainActivity.class.getSimpleName() + ":: ";
 
     private static final String KEY_SORT = "sort";
@@ -39,7 +39,7 @@ public class MainActivity extends AppCompatActivity implements Callback<MoviesBy
     private RecyclerView mMoviesGrid;
     private MovieAdapter mAdapter;
     private MoviesAPIService mService;
-    private List<ResultsItem> mCache;
+    private List<ResultsItemMoviesBySort> mCache;
 
     private enum MovieSort {
         POPULAR, HIGHEST_RATED
@@ -81,7 +81,7 @@ public class MainActivity extends AppCompatActivity implements Callback<MoviesBy
     }
 
     @Override
-    public void onResponse(Call<MoviesBySortResponse> call, Response<MoviesBySortResponse> response) {
+    public void onResponse(Call<ResponseMoviesBySort> call, Response<ResponseMoviesBySort> response) {
         if (response.isSuccessful()) {
             mAdapter.setMovieList(response.body().getResults());
             mAdapter.notifyDataSetChanged();
@@ -102,7 +102,7 @@ public class MainActivity extends AppCompatActivity implements Callback<MoviesBy
     }
 
     @Override
-    public void onFailure(Call<MoviesBySortResponse> call, Throwable t) {
+    public void onFailure(Call<ResponseMoviesBySort> call, Throwable t) {
         Log.d(APP_TAG, CLASS_TAG + "onFailure");
     }
 
@@ -116,13 +116,13 @@ public class MainActivity extends AppCompatActivity implements Callback<MoviesBy
     public void getMoviesByPopular(MenuItem item) {
         Log.d(APP_TAG, CLASS_TAG + "Calling MovieDB API using Retrofit");
         mCurrentMovieSort = MovieSort.POPULAR;
-        mService.getMovies("popular", BuildConfig.API_KEY).enqueue(this);
+        mService.getMoviesBySort("popular", BuildConfig.API_KEY).enqueue(this);
     }
 
     public void getMoviesByHighestRated(MenuItem item) {
         Log.d(APP_TAG, CLASS_TAG + "Calling MovieDB API using Retrofit");
         mCurrentMovieSort = MovieSort.HIGHEST_RATED;
-        mService.getMovies("top_rated", BuildConfig.API_KEY).enqueue(this);
+        mService.getMoviesBySort("top_rated", BuildConfig.API_KEY).enqueue(this);
     }
 
     private void handleRotate(Bundle savedInstanceState) {
@@ -147,7 +147,7 @@ public class MainActivity extends AppCompatActivity implements Callback<MoviesBy
     @Override
     public void onClick(int pos) {
         Intent intent = new Intent(this, MovieDetailsActivity.class);
-        ResultsItem movie = mCache.get(pos);
+        ResultsItemMoviesBySort movie = mCache.get(pos);
         intent.putExtra(KEY_MOVIE, Parcels.wrap(movie));
         startActivity(intent);
     }

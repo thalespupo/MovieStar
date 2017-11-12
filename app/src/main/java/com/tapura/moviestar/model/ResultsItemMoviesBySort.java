@@ -7,7 +7,7 @@ import org.parceler.Parcel;
 import java.util.List;
 
 @Parcel
-public class ResultsItem {
+public class ResultsItemMoviesBySort {
 
     @SerializedName("overview")
     private String overview;
@@ -170,7 +170,7 @@ public class ResultsItem {
     @Override
     public String toString() {
         return
-                "ResultsItem{" +
+                "ResultsItemMoviesBySort{" +
                         "overview = '" + overview + '\'' +
                         ",original_language = '" + originalLanguage + '\'' +
                         ",original_title = '" + originalTitle + '\'' +
