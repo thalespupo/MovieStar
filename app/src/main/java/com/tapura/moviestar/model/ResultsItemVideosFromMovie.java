@@ -96,7 +96,7 @@ public class ResultsItemVideosFromMovie {
     @Override
     public String toString() {
         return
-                "ResultsItem{" +
+                "ResultsItemVideosFromMovie{" +
                         "site = '" + site + '\'' +
                         ",size = '" + size + '\'' +
                         ",iso_3166_1 = '" + iso31661 + '\'' +

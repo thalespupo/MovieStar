@@ -1,6 +1,7 @@
 package com.tapura.moviestar.api;
 
 import com.tapura.moviestar.model.ResponseMoviesBySort;
+import com.tapura.moviestar.model.ResponseReviewsFromMovie;
 import com.tapura.moviestar.model.ResponseVideosFromMovie;
 
 import retrofit2.Call;
@@ -16,6 +17,11 @@ public interface MoviesAPIService {
 
     @GET("movie/{id}/videos")
     Call<ResponseVideosFromMovie> getVideosFromMovie(
+            @Path("id") String id,
+            @Query("api_key") String apiKey);
+
+    @GET("movie/{id}/reviews")
+    Call<ResponseReviewsFromMovie> getReviewsFromMovie(
             @Path("id") String id,
             @Query("api_key") String apiKey);
 }
