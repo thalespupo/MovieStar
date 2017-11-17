@@ -10,7 +10,7 @@ public class ResponseVideosFromMovie {
     private int id;
 
     @SerializedName("results")
-    private List<ResultsItemVideosFromMovie> results;
+    private List<Video> results;
 
     public void setId(int id) {
         this.id = id;
@@ -20,11 +20,11 @@ public class ResponseVideosFromMovie {
         return id;
     }
 
-    public void setResults(List<ResultsItemVideosFromMovie> results) {
+    public void setResults(List<Video> results) {
         this.results = results;
     }
 
-    public List<ResultsItemVideosFromMovie> getResults() {
+    public List<Video> getResults() {
         return results;
     }
 

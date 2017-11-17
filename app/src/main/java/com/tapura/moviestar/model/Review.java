@@ -2,7 +2,7 @@ package com.tapura.moviestar.model;
 
 import com.google.gson.annotations.SerializedName;
 
-public class ResultsItemReviewsFromMovie {
+public class Review {
 
     @SerializedName("author")
     private String author;
@@ -51,7 +51,7 @@ public class ResultsItemReviewsFromMovie {
     @Override
     public String toString() {
         return
-                "ResultsItemReviewsFromMovie{" +
+                "Review{" +
                         "author = '" + author + '\'' +
                         ",id = '" + id + '\'' +
                         ",content = '" + content + '\'' +

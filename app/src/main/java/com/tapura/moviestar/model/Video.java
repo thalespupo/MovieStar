@@ -3,7 +3,7 @@ package com.tapura.moviestar.model;
 
 import com.google.gson.annotations.SerializedName;
 
-public class ResultsItemVideosFromMovie {
+public class Video {
 
     @SerializedName("site")
     private String site;
@@ -96,7 +96,7 @@ public class ResultsItemVideosFromMovie {
     @Override
     public String toString() {
         return
-                "ResultsItemVideosFromMovie{" +
+                "Video{" +
                         "site = '" + site + '\'' +
                         ",size = '" + size + '\'' +
                         ",iso_3166_1 = '" + iso31661 + '\'' +

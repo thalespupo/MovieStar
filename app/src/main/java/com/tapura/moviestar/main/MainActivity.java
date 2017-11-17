@@ -15,8 +15,8 @@ import com.tapura.moviestar.R;
 import com.tapura.moviestar.api.MoviesAPIService;
 import com.tapura.moviestar.api.MoviesAPIServiceBuilder;
 import com.tapura.moviestar.details.MovieDetailsActivity;
+import com.tapura.moviestar.model.Movie;
 import com.tapura.moviestar.model.ResponseMoviesBySort;
-import com.tapura.moviestar.model.ResultsItemMoviesBySort;
 
 import org.parceler.Parcels;
 
@@ -39,7 +39,7 @@ public class MainActivity extends AppCompatActivity implements Callback<Response
     private RecyclerView mMoviesGrid;
     private MovieAdapter mAdapter;
     private MoviesAPIService mService;
-    private List<ResultsItemMoviesBySort> mCache;
+    private List<Movie> mCache;
 
     private enum MovieSort {
         POPULAR, HIGHEST_RATED
@@ -147,7 +147,7 @@ public class MainActivity extends AppCompatActivity implements Callback<Response
     @Override
     public void onClick(int pos) {
         Intent intent = new Intent(this, MovieDetailsActivity.class);
-        ResultsItemMoviesBySort movie = mCache.get(pos);
+        Movie movie = mCache.get(pos);
         intent.putExtra(KEY_MOVIE, Parcels.wrap(movie));
         startActivity(intent);
     }

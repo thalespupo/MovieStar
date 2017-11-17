@@ -1,23 +1,19 @@
 package com.tapura.moviestar.details;
 
-import android.content.Intent;
-import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.widget.ImageView;
 
-import com.squareup.picasso.Picasso;
 import com.tapura.moviestar.R;
 import com.tapura.moviestar.api.MoviesAPIService;
 import com.tapura.moviestar.api.MoviesAPIServiceBuilder;
 import com.tapura.moviestar.model.ResponseReviewsFromMovie;
 import com.tapura.moviestar.model.ResponseVideosFromMovie;
-import com.tapura.moviestar.model.ResultsItemMoviesBySort;
-import com.tapura.moviestar.model.ResultsItemReviewsFromMovie;
-import com.tapura.moviestar.model.ResultsItemVideosFromMovie;
+import com.tapura.moviestar.model.Movie;
+import com.tapura.moviestar.model.Review;
+import com.tapura.moviestar.model.Video;
 
 import org.parceler.Parcels;
 
@@ -47,7 +43,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
 
         mRecyclerView = findViewById(R.id.recycler_view_movie_details);
 
-        ResultsItemMoviesBySort movie = Parcels.unwrap(getIntent().getParcelableExtra(KEY_MOVIE));
+        Movie movie = Parcels.unwrap(getIntent().getParcelableExtra(KEY_MOVIE));
         setTitle(movie.getTitle());
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
@@ -69,7 +65,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
                     @Override
                     public void onResponse(Call<ResponseReviewsFromMovie> call, Response<ResponseReviewsFromMovie> response) {
                         if (response.isSuccessful()) {
-                            for (ResultsItemReviewsFromMovie review :response.body().getResults()) {
+                            for (Review review :response.body().getResults()) {
                                 mItems.add(review);
                             }
                             mAdapter.setItems(mItems);
@@ -89,7 +85,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
                     @Override
                     public void onResponse(Call<ResponseVideosFromMovie> call, Response<ResponseVideosFromMovie> response) {
                         if (response.isSuccessful()) {
-                            for (ResultsItemVideosFromMovie video :response.body().getResults()) {
+                            for (Video video :response.body().getResults()) {
                                 mItems.add(video);
                             }
                             mAdapter.setItems(mItems);

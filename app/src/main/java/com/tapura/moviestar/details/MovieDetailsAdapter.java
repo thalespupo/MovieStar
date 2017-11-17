@@ -10,9 +10,9 @@ import android.view.ViewGroup;
 
 import com.squareup.picasso.Picasso;
 import com.tapura.moviestar.R;
-import com.tapura.moviestar.model.ResultsItemMoviesBySort;
-import com.tapura.moviestar.model.ResultsItemReviewsFromMovie;
-import com.tapura.moviestar.model.ResultsItemVideosFromMovie;
+import com.tapura.moviestar.model.Movie;
+import com.tapura.moviestar.model.Review;
+import com.tapura.moviestar.model.Video;
 
 import java.util.List;
 
@@ -45,11 +45,11 @@ public class MovieDetailsAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
     @Override
     public int getItemViewType(int position) {
-        if (mItems.get(position) instanceof ResultsItemMoviesBySort) {
+        if (mItems.get(position) instanceof Movie) {
             return DETAILS;
-        } else if (mItems.get(position) instanceof ResultsItemVideosFromMovie) {
+        } else if (mItems.get(position) instanceof Video) {
             return VIDEO;
-        } else if (mItems.get(position) instanceof ResultsItemReviewsFromMovie) {
+        } else if (mItems.get(position) instanceof Review) {
             return REVIEW;
         }
         return -1;
@@ -104,7 +104,7 @@ public class MovieDetailsAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
 
     private void onBindDetails(DetailsViewHolder detailsViewHolder, int position) {
-        ResultsItemMoviesBySort movie = (ResultsItemMoviesBySort) mItems.get(position);
+        Movie movie = (Movie) mItems.get(position);
 
         Picasso.with(mContext).load(movie.getBackdropPath()).into(detailsViewHolder.getIvPoster());
         detailsViewHolder.getTvOriginalTitle().setText(movie.getOriginalTitle());

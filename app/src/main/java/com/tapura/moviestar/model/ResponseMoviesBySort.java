@@ -13,7 +13,7 @@ public class ResponseMoviesBySort {
     private int totalPages;
 
     @SerializedName("results")
-    private List<ResultsItemMoviesBySort> results;
+    private List<Movie> results;
 
     @SerializedName("total_results")
     private int totalResults;
@@ -34,11 +34,11 @@ public class ResponseMoviesBySort {
         return totalPages;
     }
 
-    public void setResults(List<ResultsItemMoviesBySort> results) {
+    public void setResults(List<Movie> results) {
         this.results = results;
     }
 
-    public List<ResultsItemMoviesBySort> getResults() {
+    public List<Movie> getResults() {
         return results;
     }
 
