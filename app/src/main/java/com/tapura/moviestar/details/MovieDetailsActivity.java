@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.widget.ImageView;
 
@@ -11,7 +13,6 @@ import com.squareup.picasso.Picasso;
 import com.tapura.moviestar.R;
 import com.tapura.moviestar.api.MoviesAPIService;
 import com.tapura.moviestar.api.MoviesAPIServiceBuilder;
-import com.tapura.moviestar.databinding.ActivityMovieDetailsBinding;
 import com.tapura.moviestar.model.ResponseReviewsFromMovie;
 import com.tapura.moviestar.model.ResponseVideosFromMovie;
 import com.tapura.moviestar.model.ResultsItemMoviesBySort;
@@ -20,6 +21,7 @@ import com.tapura.moviestar.model.ResultsItemVideosFromMovie;
 
 import org.parceler.Parcels;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Call;
@@ -33,23 +35,33 @@ import static com.tapura.moviestar.Constants.KEY_MOVIE;
 public class MovieDetailsActivity extends AppCompatActivity {
     private static final String CLASS_TAG = MovieDetailsActivity.class.getSimpleName() + ":: ";
 
+    private RecyclerView mRecyclerView;
+    private MovieDetailsAdapter mAdapter;
     private MoviesAPIService mService;
-    private List<ResultsItemReviewsFromMovie> mReviews;
-    private List<ResultsItemVideosFromMovie> mVideos;
+    private List<Object> mItems;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        ActivityMovieDetailsBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_movie_details);
+        setContentView(R.layout.activity_movie_details);
 
-        Intent intent = getIntent();
-        ResultsItemMoviesBySort movie = Parcels.unwrap(intent.getParcelableExtra(KEY_MOVIE));
+        mRecyclerView = findViewById(R.id.recycler_view_movie_details);
+
+        ResultsItemMoviesBySort movie = Parcels.unwrap(getIntent().getParcelableExtra(KEY_MOVIE));
         setTitle(movie.getTitle());
 
-        binding.setMovie(movie);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
 
-        ImageView iv = findViewById(R.id.imageview_movie_posterpath);
-        Picasso.with(this).load(movie.getBackdropPath()).into(iv);
+        mAdapter = new MovieDetailsAdapter(this);
+
+        mRecyclerView.setAdapter(mAdapter);
+        mRecyclerView.setLayoutManager(layoutManager);
+        mRecyclerView.setHasFixedSize(true);
+
+        mItems = new ArrayList<>();
+        mItems.add(movie);
+
+        mAdapter.setItems(mItems);
 
         mService = MoviesAPIServiceBuilder.build();
         mService.getReviewsFromMovie(String.valueOf(movie.getId()), API_KEY)
@@ -57,7 +69,10 @@ public class MovieDetailsActivity extends AppCompatActivity {
                     @Override
                     public void onResponse(Call<ResponseReviewsFromMovie> call, Response<ResponseReviewsFromMovie> response) {
                         if (response.isSuccessful()) {
-                            mReviews = response.body().getResults();
+                            for (ResultsItemReviewsFromMovie review :response.body().getResults()) {
+                                mItems.add(review);
+                            }
+                            mAdapter.setItems(mItems);
                         } else {
                             Log.e(APP_TAG, CLASS_TAG + "reviews response failed");
                         }
@@ -74,7 +89,10 @@ public class MovieDetailsActivity extends AppCompatActivity {
                     @Override
                     public void onResponse(Call<ResponseVideosFromMovie> call, Response<ResponseVideosFromMovie> response) {
                         if (response.isSuccessful()) {
-                            mVideos = response.body().getResults();
+                            for (ResultsItemVideosFromMovie video :response.body().getResults()) {
+                                mItems.add(video);
+                            }
+                            mAdapter.setItems(mItems);
                         } else {
                             Log.e(APP_TAG, CLASS_TAG + "videos response failed");
                         }
