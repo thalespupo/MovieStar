@@ -114,10 +114,15 @@ public class MovieDetailsAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     }
 
     private void onBindReview(ReviewViewHolder reviewViewHolder, int position) {
+        Review review = (Review) mItems.get(position);
 
+        reviewViewHolder.getTvAuthor().setText(review.getAuthor());
+        reviewViewHolder.getTvContent().setText(review.getContent());
     }
 
     private void onBindVideo(VideoViewHolder videoViewHolder, int position) {
+        Video video = (Video) mItems.get(position);
 
+        videoViewHolder.getTvVideoLabel().setText(video.getName());
     }
 }

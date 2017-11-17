@@ -6,11 +6,21 @@ import android.view.View;
 import android.widget.TextView;
 
 public class VideoViewHolder extends RecyclerView.ViewHolder {
-    private TextView mTvVideoLabel;
+    private TextView tvVideoLabel;
     private String key;
 
     public VideoViewHolder(View itemView) {
         super(itemView);
+        tvVideoLabel = itemView.findViewById(android.R.id.text1);
+
+    }
+
+    public TextView getTvVideoLabel() {
+        return tvVideoLabel;
+    }
+
+    public void setTvVideoLabel(TextView tvVideoLabel) {
+        this.tvVideoLabel = tvVideoLabel;
     }
 
     public String getKey() {
