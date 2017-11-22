@@ -35,6 +35,13 @@ public class MovieDetailsActivity extends AppCompatActivity {
     private MovieDetailsAdapter mAdapter;
     private MoviesAPIService mService;
     private List<Object> mItems;
+    private List<Video> mVideos;
+    private List<Review> mReviews;
+
+    private boolean isVideosLoaded = false;
+    private boolean isReviewsLoaded = false;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,49 +64,72 @@ public class MovieDetailsActivity extends AppCompatActivity {
         mItems = new ArrayList<>();
         mItems.add(movie);
 
+        mVideos = new ArrayList<>();
+        mReviews = new ArrayList<>();
+
         mAdapter.setItems(mItems);
 
         mService = MoviesAPIServiceBuilder.build();
-        mService.getReviewsFromMovie(String.valueOf(movie.getId()), API_KEY)
-                .enqueue(new Callback<ResponseReviewsFromMovie>() {
-                    @Override
-                    public void onResponse(Call<ResponseReviewsFromMovie> call, Response<ResponseReviewsFromMovie> response) {
-                        if (response.isSuccessful()) {
-                            for (Review review :response.body().getResults()) {
-                                mItems.add(review);
-                            }
-                            mAdapter.setItems(mItems);
-                        } else {
-                            Log.e(APP_TAG, CLASS_TAG + "reviews response failed");
-                        }
-                    }
-
-                    @Override
-                    public void onFailure(Call<ResponseReviewsFromMovie> call, Throwable t) {
-                        Log.e(APP_TAG, CLASS_TAG + "reviews call was onFailure:" + t.getMessage());
-                    }
-                });
 
         mService.getVideosFromMovie(String.valueOf(movie.getId()), API_KEY)
                 .enqueue(new Callback<ResponseVideosFromMovie>() {
                     @Override
                     public void onResponse(Call<ResponseVideosFromMovie> call, Response<ResponseVideosFromMovie> response) {
+                        isVideosLoaded = true;
                         if (response.isSuccessful()) {
-                            for (Video video :response.body().getResults()) {
-                                mItems.add(video);
-                            }
-                            mAdapter.setItems(mItems);
+                            mVideos = response.body().getResults();
                         } else {
-                            Log.e(APP_TAG, CLASS_TAG + "videos response failed");
+                            Log.e(APP_TAG, CLASS_TAG + "videos response failed");;
                         }
+                        setItemsInAdapter();
                     }
 
                     @Override
                     public void onFailure(Call<ResponseVideosFromMovie> call, Throwable t) {
+                        isVideosLoaded = true;
                         Log.e(APP_TAG, CLASS_TAG + "videos call was onFailure:" + t.getMessage());
+
+                        setItemsInAdapter();
+                    }
+                });
+
+        mService.getReviewsFromMovie(String.valueOf(movie.getId()), API_KEY)
+                .enqueue(new Callback<ResponseReviewsFromMovie>() {
+                    @Override
+                    public void onResponse(Call<ResponseReviewsFromMovie> call, Response<ResponseReviewsFromMovie> response) {
+                        isReviewsLoaded = true;
+                        if (response.isSuccessful()) {
+                            mReviews = response.body().getResults();
+                        } else {
+                            Log.e(APP_TAG, CLASS_TAG + "reviews response failed");
+                        }
+                        setItemsInAdapter();
+                    }
+
+                    @Override
+                    public void onFailure(Call<ResponseReviewsFromMovie> call, Throwable t) {
+                        isReviewsLoaded = true;
+                        Log.e(APP_TAG, CLASS_TAG + "reviews call was onFailure:" + t.getMessage());
+
+                        setItemsInAdapter();
                     }
                 });
 
     }
 
+    private void setItemsInAdapter() {
+        if (isVideosLoaded && isReviewsLoaded) {
+            mItems.add(getString(R.string.videos_header));
+            for (Video v: mVideos){
+                mItems.add(v);
+            }
+
+            mItems.add(getString(R.string.review_header));
+            for (Review r : mReviews) {
+                mItems.add(r);
+            }
+
+            mAdapter.setItems(mItems);
+        }
+    }
 }

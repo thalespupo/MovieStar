@@ -9,4 +9,6 @@
     <string name="label_rating">Rating:</string>
     <string name="label_release_date">"Release date: "</string>
     <string name="desc_movie_poster">Movie poster</string>
+    <string name="videos_header">Videos</string>
+    <string name="review_header">Reviews</string>
 </resources>

@@ -2,6 +2,8 @@ package com.tapura.moviestar.details;
 
 
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.Typeface;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -28,6 +30,7 @@ public class MovieDetailsAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     private final int DETAILS = 0;
     private final int VIDEO = 1;
     private final int REVIEW = 2;
+    private final int CONTENT_HEADER = 3;
 
     public MovieDetailsAdapter(Context context) {
         mContext = context;
@@ -51,6 +54,8 @@ public class MovieDetailsAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             return VIDEO;
         } else if (mItems.get(position) instanceof Review) {
             return REVIEW;
+        } else if (mItems.get(position) instanceof String) {
+            return CONTENT_HEADER;
         }
         return -1;
     }
@@ -75,6 +80,10 @@ public class MovieDetailsAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                 View v3 = inflater.inflate(android.R.layout.simple_list_item_1, parent, false);
                 viewHolder = new VideoViewHolder(v3);
                 break;
+            case CONTENT_HEADER:
+                View v4 = inflater.inflate(R.layout.movie_header, parent, false);
+                viewHolder = new ContentHeaderViewHolder(v4);
+                break;
             default:
                 Log.wtf(APP_TAG, CLASS_TAG + "on create using default view holder... WHY???");
                 return null;
@@ -97,11 +106,14 @@ public class MovieDetailsAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                 VideoViewHolder videoViewHolder = (VideoViewHolder) holder;
                 onBindVideo(videoViewHolder, position);
                 break;
+            case CONTENT_HEADER:
+                ContentHeaderViewHolder contentHeaderViewHolder = (ContentHeaderViewHolder) holder;
+                onBindHeader(contentHeaderViewHolder, position);
+                break;
             default:
                 Log.wtf(APP_TAG, CLASS_TAG + "on bind using default view holder... WHY???");
         }
     }
-
 
     private void onBindDetails(DetailsViewHolder detailsViewHolder, int position) {
         Movie movie = (Movie) mItems.get(position);
@@ -124,5 +136,11 @@ public class MovieDetailsAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         Video video = (Video) mItems.get(position);
 
         videoViewHolder.getTvVideoLabel().setText(video.getName());
+    }
+
+    private void onBindHeader(ContentHeaderViewHolder contentHeaderViewHolder, int position) {
+        String header = (String) mItems.get(position);
+
+        contentHeaderViewHolder.getTvHeader().setText(header);
     }
 }
