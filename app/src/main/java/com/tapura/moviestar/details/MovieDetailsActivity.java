@@ -1,17 +1,20 @@
 package com.tapura.moviestar.details;
 
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 
 import com.tapura.moviestar.R;
 import com.tapura.moviestar.api.MoviesAPIService;
 import com.tapura.moviestar.api.MoviesAPIServiceBuilder;
+import com.tapura.moviestar.model.Movie;
 import com.tapura.moviestar.model.ResponseReviewsFromMovie;
 import com.tapura.moviestar.model.ResponseVideosFromMovie;
-import com.tapura.moviestar.model.Movie;
 import com.tapura.moviestar.model.Review;
 import com.tapura.moviestar.model.Video;
 
@@ -41,6 +44,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
     private boolean isVideosLoaded = false;
     private boolean isReviewsLoaded = false;
 
+    private boolean isFavourite = false;
 
 
     @Override
@@ -79,7 +83,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
                         if (response.isSuccessful()) {
                             mVideos = response.body().getResults();
                         } else {
-                            Log.e(APP_TAG, CLASS_TAG + "videos response failed");;
+                            Log.e(APP_TAG, CLASS_TAG + "videos response failed");
                         }
                         setItemsInAdapter();
                     }
@@ -117,10 +121,17 @@ public class MovieDetailsActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_details, menu);
+        return true;
+    }
+
     private void setItemsInAdapter() {
         if (isVideosLoaded && isReviewsLoaded) {
             mItems.add(getString(R.string.videos_header));
-            for (Video v: mVideos){
+            for (Video v : mVideos) {
                 mItems.add(v);
             }
 
@@ -132,4 +143,18 @@ public class MovieDetailsActivity extends AppCompatActivity {
             mAdapter.setItems(mItems);
         }
     }
+
+    public void setFavourite(MenuItem item) {
+        Drawable favourite = getResources().getDrawable(R.drawable.ic_star_gold, null);
+        Drawable notFavourite = getResources().getDrawable(R.drawable.ic_star_gold_border, null);
+
+        if (isFavourite) {
+            item.setIcon(notFavourite);
+            isFavourite = false;
+        } else {
+            item.setIcon(favourite);
+            isFavourite = true;
+        }
+    }
+
 }
