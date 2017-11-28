@@ -33,6 +33,8 @@ import static com.tapura.moviestar.Constants.KEY_MOVIE;
 
 public class MovieDetailsActivity extends AppCompatActivity {
     private static final String CLASS_TAG = MovieDetailsActivity.class.getSimpleName() + ":: ";
+    private static final String KEY_ITEMS_LIST = "list_items";
+    private static final String KEY_IS_FAVOURITE = "is_favourite";
 
     private RecyclerView mRecyclerView;
     private MovieDetailsAdapter mAdapter;
@@ -40,6 +42,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
     private List<Object> mItems;
     private List<Video> mVideos;
     private List<Review> mReviews;
+    private Movie mMovie;
 
     private boolean isVideosLoaded = false;
     private boolean isReviewsLoaded = false;
@@ -54,8 +57,8 @@ public class MovieDetailsActivity extends AppCompatActivity {
 
         mRecyclerView = findViewById(R.id.recycler_view_movie_details);
 
-        Movie movie = Parcels.unwrap(getIntent().getParcelableExtra(KEY_MOVIE));
-        setTitle(movie.getTitle());
+        mMovie = Parcels.unwrap(getIntent().getParcelableExtra(KEY_MOVIE));
+        setTitle(mMovie.getTitle());
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
 
@@ -66,7 +69,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
         mRecyclerView.setHasFixedSize(true);
 
         mItems = new ArrayList<>();
-        mItems.add(movie);
+        mItems.add(mMovie);
 
         mVideos = new ArrayList<>();
         mReviews = new ArrayList<>();
@@ -75,7 +78,15 @@ public class MovieDetailsActivity extends AppCompatActivity {
 
         mService = MoviesAPIServiceBuilder.build();
 
-        mService.getVideosFromMovie(String.valueOf(movie.getId()), API_KEY)
+        if (savedInstanceState != null) {
+            loadFrom(savedInstanceState);
+        } else {
+            requestVideosAndReviews();
+        }
+    }
+
+    private void requestVideosAndReviews() {
+        mService.getVideosFromMovie(String.valueOf(mMovie.getId()), API_KEY)
                 .enqueue(new Callback<ResponseVideosFromMovie>() {
                     @Override
                     public void onResponse(Call<ResponseVideosFromMovie> call, Response<ResponseVideosFromMovie> response) {
@@ -97,7 +108,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
                     }
                 });
 
-        mService.getReviewsFromMovie(String.valueOf(movie.getId()), API_KEY)
+        mService.getReviewsFromMovie(String.valueOf(mMovie.getId()), API_KEY)
                 .enqueue(new Callback<ResponseReviewsFromMovie>() {
                     @Override
                     public void onResponse(Call<ResponseReviewsFromMovie> call, Response<ResponseReviewsFromMovie> response) {
@@ -118,13 +129,13 @@ public class MovieDetailsActivity extends AppCompatActivity {
                         setItemsInAdapter();
                     }
                 });
-
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_details, menu);
+        setFavourite(menu.getItem(0), isFavourite);
         return true;
     }
 
@@ -144,17 +155,39 @@ public class MovieDetailsActivity extends AppCompatActivity {
         }
     }
 
-    public void setFavourite(MenuItem item) {
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.menu_mark_favourite) {
+            setFavourite(item, !isFavourite);
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    public void setFavourite(MenuItem item, boolean isFav) {
+
         Drawable favourite = getResources().getDrawable(R.drawable.ic_star_gold, null);
         Drawable notFavourite = getResources().getDrawable(R.drawable.ic_star_gold_border, null);
 
-        if (isFavourite) {
-            item.setIcon(notFavourite);
-            isFavourite = false;
-        } else {
+        if (isFav) {
             item.setIcon(favourite);
             isFavourite = true;
+        } else {
+            item.setIcon(notFavourite);
+            isFavourite = false;
         }
     }
 
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putBoolean(KEY_IS_FAVOURITE, isFavourite);
+        outState.putParcelable(KEY_ITEMS_LIST, Parcels.wrap(mItems));
+        super.onSaveInstanceState(outState);
+    }
+
+
+    private void loadFrom(Bundle savedInstanceState) {
+        isFavourite = savedInstanceState.getBoolean(KEY_IS_FAVOURITE);
+        mItems = Parcels.unwrap(savedInstanceState.getParcelable(KEY_ITEMS_LIST));
+        mAdapter.setItems(mItems);
+    }
 }
