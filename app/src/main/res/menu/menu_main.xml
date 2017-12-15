@@ -14,4 +14,10 @@
         android:title="@string/menu_highest_rated_title"
         app:showAsAction="ifRoom"
         android:onClick="getMoviesByHighestRated"/>
+    <item
+        android:id="@+id/menu_action_favourites"
+        android:orderInCategory="100"
+        android:title="@string/menu_action_favourites"
+        app:showAsAction="ifRoom"
+        android:onClick="getFavouriteMovies"/>
 </menu>

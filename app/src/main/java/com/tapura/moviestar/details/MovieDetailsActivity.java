@@ -35,12 +35,13 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import static android.R.attr.data;
 import static com.tapura.moviestar.BuildConfig.API_KEY;
 import static com.tapura.moviestar.Constants.APP_TAG;
 import static com.tapura.moviestar.Constants.KEY_MOVIE;
 import static com.tapura.moviestar.data.FavouriteContentProvider.FAVOURITE_WITH_ID;
 
-public class MovieDetailsActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
+public class MovieDetailsActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Boolean> {
     private static final String CLASS_TAG = MovieDetailsActivity.class.getSimpleName() + ":: ";
     private static final String KEY_ITEMS_LIST = "list_items";
     private static final String KEY_IS_FAVOURITE = "is_favourite";
@@ -83,7 +84,7 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
         if (savedInstanceState != null) {
             loadFrom(savedInstanceState);
         } else {
-            isFavourite = getFromDb();
+            checkFavourite();
             requestVideosAndReviews();
         }
     }
@@ -124,6 +125,10 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
                 });
     }
 
+    private void checkFavourite() {
+        getInDb(mMovie.getId());
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -143,25 +148,16 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.menu_mark_favourite) {
-            setFavourite(item, !isFavourite);
+            if (!isFavourite) {
+                insertInDb(mMovie);
+            } else {
+                deleteInDb(mMovie.getId());
+            }
+
+            isFavourite = !isFavourite;
+            item.setIcon(getDrawableByBool());
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    public void setFavourite(MenuItem item, boolean isFav) {
-
-        Drawable favourite = getResources().getDrawable(R.drawable.ic_star_gold, null);
-        Drawable notFavourite = getResources().getDrawable(R.drawable.ic_star_gold_border, null);
-
-        if (isFav) {
-            item.setIcon(favourite);
-            isFavourite = true;
-            insertInDb(mMovie.getId());
-        } else {
-            item.setIcon(notFavourite);
-            isFavourite = false;
-            deleteInDb(mMovie.getId());
-        }
     }
 
     private boolean deleteInDb(int id) {
@@ -171,10 +167,17 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
         return deleteRows > 0;
     }
 
-    private void insertInDb(int id) {
+    private void insertInDb(Movie movie) {
         ContentValues cv = new ContentValues();
 
-        cv.put(FavouriteMoviesContract.FavouriteEntry.COLUMN_NAME_MOVIE, id);
+        cv.put(FavouriteMoviesContract.FavouriteEntry.COLUMN_ID_MOVIE, movie.getId());
+        cv.put(FavouriteMoviesContract.FavouriteEntry.COLUMN_MOVIE_ORIGINAL_TITLE, movie.getOriginalTitle());
+        cv.put(FavouriteMoviesContract.FavouriteEntry.COLUMN_MOVIE_TITLE, movie.getTitle());
+        cv.put(FavouriteMoviesContract.FavouriteEntry.COLUMN_MOVIE_POSTER, movie.getPosterPath());
+        cv.put(FavouriteMoviesContract.FavouriteEntry.COLUMN_MOVIE_BACKDROP, movie.getBackdropPath());
+        cv.put(FavouriteMoviesContract.FavouriteEntry.COLUMN_MOVIE_OVERVIEW, movie.getOverview());
+        cv.put(FavouriteMoviesContract.FavouriteEntry.COLUMN_MOVIE_RATING, movie.getVoteAverage());
+        cv.put(FavouriteMoviesContract.FavouriteEntry.COLUMN_MOVIE_RELEASE_DATE, movie.getReleaseDate());
 
         Uri uri = null;
         try {
@@ -188,6 +191,10 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
         } else {
             Toast.makeText(getBaseContext(), "Error", Toast.LENGTH_LONG).show();
         }
+    }
+
+    private void getInDb(int id) {
+
     }
 
     @Override
@@ -204,17 +211,11 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
         isFavourite = savedInstanceState.getBoolean(KEY_IS_FAVOURITE);
     }
 
-    public boolean getFromDb() {
-        //getContentResolver().query()
-        return fromDb;
-    }
-
     @Override
-    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+    public Loader<Boolean> onCreateLoader(int id, Bundle args) {
+        return new AsyncTaskLoader<Boolean>(this) {
 
-        return new AsyncTaskLoader<Cursor>(this) {
-
-            Cursor mTaskData = null;
+            Boolean mTaskData = null;
 
             @Override
             protected void onStartLoading() {
@@ -224,31 +225,32 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
                     forceLoad();
                 }
             }
-
             @Override
-            public Cursor loadInBackground() {
-                try {
-                    return getContentResolver().query(FavouriteMoviesContract.FavouriteEntry.CONTENT_URI,
-                            null,
-                            null,
-                            null,
-                            FavouriteMoviesContract.FavouriteEntry.COLUMN_ID_MOVIE);
-                } catch (Exception e) {
-                    Log.e(APP_TAG, CLASS_TAG + "Failed to asynchronously load data.");
-                    e.printStackTrace();
-                    return null;
-                }
+            public Boolean loadInBackground() {
+                return isMovieFavourite(getContentResolver().query(ContentUris.withAppendedId(FavouriteMoviesContract.FavouriteEntry.CONTENT_URI,
+                        mMovie.getId()),
+                        null,
+                        null,
+                        null,
+                        null));
+            }
+
+            private Boolean isMovieFavourite(Cursor query) {
+                if (query == null) return false;
+                query.close();
+                return query.getCount() > 0;
+
             }
         };
     }
-
     @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+    public void onLoadFinished(Loader<Boolean> loader, Boolean data) {
+        isFavourite = data;
 
     }
 
     @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
+    public void onLoaderReset(Loader<Boolean> loader) {
 
     }
 }

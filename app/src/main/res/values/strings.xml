@@ -11,4 +11,5 @@
     <string name="desc_movie_poster">Movie poster</string>
     <string name="videos_header">Videos</string>
     <string name="review_header">Reviews</string>
+    <string name="menu_action_favourites">Favourites</string>
 </resources>
