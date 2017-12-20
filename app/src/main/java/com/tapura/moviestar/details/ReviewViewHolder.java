@@ -10,6 +10,7 @@ import com.tapura.moviestar.R;
 public class ReviewViewHolder extends RecyclerView.ViewHolder {
     private TextView tvAuthor;
     private TextView tvContent;
+
     public ReviewViewHolder(View itemView) {
         super(itemView);
         tvAuthor = itemView.findViewById(R.id.text_view_review_author);

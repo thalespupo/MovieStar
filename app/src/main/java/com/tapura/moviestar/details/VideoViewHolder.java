@@ -6,7 +6,6 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.squareup.picasso.Target;
 import com.tapura.moviestar.R;
 import com.tapura.moviestar.model.Video;
 

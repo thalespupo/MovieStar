@@ -13,7 +13,6 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 import com.tapura.moviestar.R;
 import com.tapura.moviestar.api.MoviesAPIService;
@@ -193,7 +192,7 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
     @Override
     public void onLoadFinished(Loader<Boolean> loader, Boolean data) {
         isFavourite = data;
-        if (mMenu!=null) {
+        if (mMenu != null) {
             this.mMenu.getItem(0).setIcon(getDrawableByBool());
         }
 
