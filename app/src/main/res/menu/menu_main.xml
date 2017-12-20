@@ -6,18 +6,18 @@
         android:id="@+id/menu_action_popular"
         android:orderInCategory="100"
         android:title="@string/menu_popular_title"
-        app:showAsAction="ifRoom"
+        app:showAsAction="never"
         android:onClick="getMoviesByPopular"/>
     <item
         android:id="@+id/menu_action_highest_rated"
         android:orderInCategory="100"
         android:title="@string/menu_highest_rated_title"
-        app:showAsAction="ifRoom"
+        app:showAsAction="never"
         android:onClick="getMoviesByHighestRated"/>
     <item
         android:id="@+id/menu_action_favourites"
         android:orderInCategory="100"
         android:title="@string/menu_action_favourites"
-        app:showAsAction="ifRoom"
+        app:showAsAction="never"
         android:onClick="getFavouriteMovies"/>
 </menu>
