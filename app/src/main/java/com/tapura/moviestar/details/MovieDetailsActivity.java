@@ -1,10 +1,6 @@
 package com.tapura.moviestar.details;
 
-import android.content.ContentUris;
-import android.content.ContentValues;
-import android.database.Cursor;
 import android.graphics.drawable.Drawable;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
@@ -15,12 +11,11 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 import com.tapura.moviestar.R;
 import com.tapura.moviestar.api.MoviesAPIService;
 import com.tapura.moviestar.api.MoviesAPIServiceBuilder;
-import com.tapura.moviestar.data.sql.FavouriteMoviesContract;
+import com.tapura.moviestar.data.FavouriteDbUtils;
 import com.tapura.moviestar.model.Movie;
 import com.tapura.moviestar.model.ResponseReviewsFromMovie;
 import com.tapura.moviestar.model.ResponseVideosFromMovie;
@@ -35,7 +30,6 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-import static android.R.attr.data;
 import static com.tapura.moviestar.BuildConfig.API_KEY;
 import static com.tapura.moviestar.Constants.APP_TAG;
 import static com.tapura.moviestar.Constants.KEY_MOVIE;
@@ -55,6 +49,7 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
 
     private boolean isFavourite = false;
     private boolean fromDb;
+    private Menu mMenu;
 
 
     @Override
@@ -84,7 +79,6 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
         if (savedInstanceState != null) {
             loadFrom(savedInstanceState);
         } else {
-            checkFavourite();
             requestVideosAndReviews();
         }
     }
@@ -125,15 +119,12 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
                 });
     }
 
-    private void checkFavourite() {
-        getInDb(mMovie.getId());
-    }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_details, menu);
         menu.getItem(0).setIcon(getDrawableByBool());
+        mMenu = menu;
         return true;
     }
 
@@ -149,52 +140,15 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.menu_mark_favourite) {
             if (!isFavourite) {
-                insertInDb(mMovie);
+                FavouriteDbUtils.insert(this, mMovie);
             } else {
-                deleteInDb(mMovie.getId());
+                FavouriteDbUtils.delete(this, mMovie.getId());
             }
 
             isFavourite = !isFavourite;
             item.setIcon(getDrawableByBool());
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    private boolean deleteInDb(int id) {
-        int deleteRows = getContentResolver()
-                .delete(ContentUris.withAppendedId(FavouriteMoviesContract.FavouriteEntry.CONTENT_URI, id), null, null);
-
-        return deleteRows > 0;
-    }
-
-    private void insertInDb(Movie movie) {
-        ContentValues cv = new ContentValues();
-
-        cv.put(FavouriteMoviesContract.FavouriteEntry.COLUMN_ID_MOVIE, movie.getId());
-        cv.put(FavouriteMoviesContract.FavouriteEntry.COLUMN_MOVIE_ORIGINAL_TITLE, movie.getOriginalTitle());
-        cv.put(FavouriteMoviesContract.FavouriteEntry.COLUMN_MOVIE_TITLE, movie.getTitle());
-        cv.put(FavouriteMoviesContract.FavouriteEntry.COLUMN_MOVIE_POSTER, movie.getPosterPath());
-        cv.put(FavouriteMoviesContract.FavouriteEntry.COLUMN_MOVIE_BACKDROP, movie.getBackdropPath());
-        cv.put(FavouriteMoviesContract.FavouriteEntry.COLUMN_MOVIE_OVERVIEW, movie.getOverview());
-        cv.put(FavouriteMoviesContract.FavouriteEntry.COLUMN_MOVIE_RATING, movie.getVoteAverage());
-        cv.put(FavouriteMoviesContract.FavouriteEntry.COLUMN_MOVIE_RELEASE_DATE, movie.getReleaseDate());
-
-        Uri uri = null;
-        try {
-            uri = getContentResolver().insert(FavouriteMoviesContract.FavouriteEntry.CONTENT_URI, cv);
-        } catch (android.database.SQLException e) {
-            Toast.makeText(getBaseContext(), "Already inserted", Toast.LENGTH_LONG).show();
-        }
-
-        if (uri != null) {
-            Toast.makeText(getBaseContext(), uri.toString(), Toast.LENGTH_LONG).show();
-        } else {
-            Toast.makeText(getBaseContext(), "Error", Toast.LENGTH_LONG).show();
-        }
-    }
-
-    private void getInDb(int id) {
-
     }
 
     @Override
@@ -225,27 +179,20 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
                     forceLoad();
                 }
             }
+
             @Override
             public Boolean loadInBackground() {
-                return isMovieFavourite(getContentResolver().query(ContentUris.withAppendedId(FavouriteMoviesContract.FavouriteEntry.CONTENT_URI,
-                        mMovie.getId()),
-                        null,
-                        null,
-                        null,
-                        null));
-            }
-
-            private Boolean isMovieFavourite(Cursor query) {
-                if (query == null) return false;
-                query.close();
-                return query.getCount() > 0;
-
+                return FavouriteDbUtils.isFavouriteMovie(MovieDetailsActivity.this, mMovie.getId());
             }
         };
     }
+
     @Override
     public void onLoadFinished(Loader<Boolean> loader, Boolean data) {
         isFavourite = data;
+        if (mMenu!=null) {
+            this.mMenu.getItem(0).setIcon(getDrawableByBool());
+        }
 
     }
 

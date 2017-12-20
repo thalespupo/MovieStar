@@ -104,6 +104,10 @@ public class Movie {
     }
 
     public String getPosterPath() {
+        return posterPath;
+    }
+
+    public String getUriPosterPath() {
         return "http://image.tmdb.org/t/p/w500" + posterPath;
     }
 
@@ -112,6 +116,10 @@ public class Movie {
     }
 
     public String getBackdropPath() {
+        return backdropPath;
+    }
+
+    public String getUriBackdropPath() {
         return "https://image.tmdb.org/t/p/w1000" + backdropPath;
     }
 

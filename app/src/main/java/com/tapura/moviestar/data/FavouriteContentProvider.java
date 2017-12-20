@@ -11,13 +11,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.util.Log;
 
-import com.tapura.moviestar.data.sql.FavouriteDbHelper;
-import com.tapura.moviestar.data.sql.FavouriteMoviesContract;
-
-import static com.tapura.moviestar.data.sql.FavouriteMoviesContract.FavouriteEntry.CONTENT_URI;
-import static com.tapura.moviestar.data.sql.FavouriteMoviesContract.FavouriteEntry.TABLE_NAME;
 
 public class FavouriteContentProvider extends ContentProvider {
 
@@ -55,7 +49,7 @@ public class FavouriteContentProvider extends ContentProvider {
         Cursor retCursor;
         switch (sUriMatcher.match(uri)) {
             case FAVOURITES:
-                retCursor = db.query(TABLE_NAME,
+                retCursor = db.query(FavouriteMoviesContract.FavouriteEntry.TABLE_NAME,
                         projection,
                         selection,
                         selectionArgs,
@@ -66,16 +60,16 @@ public class FavouriteContentProvider extends ContentProvider {
             case FAVOURITE_WITH_ID:
                 String id = uri.getPathSegments().get(1);
 
-                String mSelection = "_id=?";
+                String mSelection = FavouriteMoviesContract.FavouriteEntry.COLUMN_ID_MOVIE + "=?";
                 String[] mSelectionArgs = new String[]{id};
 
-                retCursor = db.query(TABLE_NAME,
+                retCursor = db.query(FavouriteMoviesContract.FavouriteEntry.TABLE_NAME,
                         projection,
                         mSelection,
                         mSelectionArgs,
                         null,
                         null,
-                        sortOrder);
+                        null);
                 break;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
@@ -98,9 +92,9 @@ public class FavouriteContentProvider extends ContentProvider {
         Uri returnUri;
         switch (sUriMatcher.match(uri)) {
             case FAVOURITES:
-                long id = db.insert(TABLE_NAME, null, contentValues);
+                long id = db.insert(FavouriteMoviesContract.FavouriteEntry.TABLE_NAME, null, contentValues);
                 if (id > 0) {
-                    returnUri = ContentUris.withAppendedId(CONTENT_URI, id);
+                    returnUri = ContentUris.withAppendedId(FavouriteMoviesContract.FavouriteEntry.CONTENT_URI, id);
                 } else {
                     throw new android.database.SQLException("Failed to insert row into " + uri);
                 }
@@ -117,13 +111,13 @@ public class FavouriteContentProvider extends ContentProvider {
     @Override
     public int delete(@NonNull Uri uri, String selection, String[] selectionArgs) {
         int numRowsDeleted;
-        if (null == selection) selection = "1";
         switch (sUriMatcher.match(uri)) {
             case FAVOURITE_WITH_ID:
+                String id = uri.getPathSegments().get(1);
                 numRowsDeleted = mFavouriteDbHelper.getWritableDatabase().delete(
                         FavouriteMoviesContract.FavouriteEntry.TABLE_NAME,
-                        selection,
-                        selectionArgs);
+                        FavouriteMoviesContract.FavouriteEntry.COLUMN_ID_MOVIE + "=?",
+                        new String[]{id});
                 break;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);

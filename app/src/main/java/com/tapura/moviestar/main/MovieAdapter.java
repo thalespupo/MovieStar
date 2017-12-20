@@ -22,7 +22,14 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
     private List<Movie> mMovieData;
     private Context mContext;
     private MovieAdapterOnClickHandler mCallBack;
-    private Cursor mCursor;
+
+    public Movie get(int pos) {
+        return mMovieData.get(pos);
+    }
+
+    public Object getMovieList() {
+        return mMovieData;
+    }
 
     public interface MovieAdapterOnClickHandler {
         void onClick(int pos);
@@ -68,7 +75,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
     @Override
     public void onBindViewHolder(MovieAdapterViewHolder holder, int position) {
         Movie movie = mMovieData.get(position);
-        Picasso.with(mContext).load(movie.getPosterPath()).placeholder(R.drawable.movie_poster_placeholder).into(holder.mMovieImageView);
+        Picasso.with(mContext).load(movie.getUriPosterPath()).placeholder(R.drawable.movie_poster_placeholder).into(holder.mMovieImageView);
     }
 
     @Override

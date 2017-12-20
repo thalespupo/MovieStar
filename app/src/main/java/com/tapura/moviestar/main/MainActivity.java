@@ -2,7 +2,6 @@ package com.tapura.moviestar.main;
 
 import android.content.Intent;
 import android.content.res.Configuration;
-import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
@@ -18,14 +17,13 @@ import com.tapura.moviestar.BuildConfig;
 import com.tapura.moviestar.R;
 import com.tapura.moviestar.api.MoviesAPIService;
 import com.tapura.moviestar.api.MoviesAPIServiceBuilder;
-import com.tapura.moviestar.data.sql.FavouriteMoviesContract;
+import com.tapura.moviestar.data.FavouriteDbUtils;
 import com.tapura.moviestar.details.MovieDetailsActivity;
 import com.tapura.moviestar.model.Movie;
 import com.tapura.moviestar.model.ResponseMoviesBySort;
 
 import org.parceler.Parcels;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Call;
@@ -33,9 +31,8 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 import static com.tapura.moviestar.Constants.APP_TAG;
-import static com.tapura.moviestar.Constants.KEY_FAVOURITE;
 import static com.tapura.moviestar.Constants.KEY_MOVIE;
-import static com.tapura.moviestar.data.FavouriteContentProvider.FAVOURITE_WITH_ID;
+import static com.tapura.moviestar.data.FavouriteContentProvider.FAVOURITES;
 
 public class MainActivity extends AppCompatActivity implements Callback<ResponseMoviesBySort>, MovieAdapter.MovieAdapterOnClickHandler, LoaderManager.LoaderCallbacks<List<Movie>> {
     private static final String CLASS_TAG = MainActivity.class.getSimpleName() + ":: ";
@@ -46,8 +43,7 @@ public class MainActivity extends AppCompatActivity implements Callback<Response
     private RecyclerView mMoviesGrid;
     private MovieAdapter mAdapter;
     private MoviesAPIService mService;
-    private List<Movie> mCache;
-    private List<Movie> mFavourites;
+    private Loader<List<Movie>> mLoader;
 
     private enum MovieSort {
         POPULAR, HIGHEST_RATED, FAVOURITE
@@ -77,12 +73,7 @@ public class MainActivity extends AppCompatActivity implements Callback<Response
         mMoviesGrid.setLayoutManager(layoutManager);
         mMoviesGrid.setHasFixedSize(true);
 
-        mCache = new ArrayList<>();
-        mFavourites = new ArrayList<>();
-
         mService = MoviesAPIServiceBuilder.build();
-
-        getSupportLoaderManager().initLoader(FAVOURITE_WITH_ID, null, this);
 
         if (savedInstanceState != null) {
             handleRotate(savedInstanceState);
@@ -96,8 +87,6 @@ public class MainActivity extends AppCompatActivity implements Callback<Response
         if (response.isSuccessful()) {
             mAdapter.setMovieList(response.body().getResults());
             mAdapter.notifyDataSetChanged();
-            mCache = response.body().getResults();
-
             Log.d(APP_TAG, CLASS_TAG + "Movie list set in adapter");
         } else {
             // TODO else for "response.isSuccessful"
@@ -108,7 +97,7 @@ public class MainActivity extends AppCompatActivity implements Callback<Response
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         outState.putString(KEY_SORT, mCurrentMovieSort.name());
-        outState.putParcelable(KEY_MOVIES_LIST, Parcels.wrap(mCache));
+        outState.putParcelable(KEY_MOVIES_LIST, Parcels.wrap(mAdapter.getMovieList()));
         super.onSaveInstanceState(outState);
     }
 
@@ -137,14 +126,15 @@ public class MainActivity extends AppCompatActivity implements Callback<Response
     }
 
     public void getFavouriteMovies(MenuItem item) {
-        mAdapter.setMovieList(mFavourites);
+        Log.d(APP_TAG, CLASS_TAG + "DB call via AsyncLoader");
+        mCurrentMovieSort = MovieSort.FAVOURITE;
+        mLoader = getSupportLoaderManager().initLoader(FAVOURITES, null, this);
     }
-
 
     private void handleRotate(Bundle savedInstanceState) {
         mCurrentMovieSort = MovieSort.valueOf(savedInstanceState.getString(KEY_SORT));
-        mCache = Parcels.unwrap(savedInstanceState.getParcelable(KEY_MOVIES_LIST));
-        if (mCache == null) {
+        List<Movie> savedList = Parcels.unwrap(savedInstanceState.getParcelable(KEY_MOVIES_LIST));
+        if (savedList == null) {
             switch (mCurrentMovieSort) {
                 case POPULAR:
                     getMoviesByPopular(null);
@@ -156,20 +146,19 @@ public class MainActivity extends AppCompatActivity implements Callback<Response
                     getFavouriteMovies(null);
             }
         } else {
-            mAdapter.setMovieList(mCache);
-            mAdapter.notifyDataSetChanged();
+            if (mCurrentMovieSort != MovieSort.FAVOURITE) { // Always refresh for local database
+                mAdapter.setMovieList(savedList);
+            } else {
+                getFavouriteMovies(null);
+            }
         }
     }
-
 
     @Override
     public void onClick(int pos) {
         Intent intent = new Intent(this, MovieDetailsActivity.class);
-        Movie movie = mCache.get(pos);
+        Movie movie = mAdapter.get(pos);
         intent.putExtra(KEY_MOVIE, Parcels.wrap(movie));
-        if (mCurrentMovieSort.equals(MovieSort.FAVOURITE)) {
-            intent.putExtra(KEY_FAVOURITE, true);
-        }
         startActivity(intent);
     }
 
@@ -191,48 +180,17 @@ public class MainActivity extends AppCompatActivity implements Callback<Response
 
             @Override
             public List<Movie> loadInBackground() {
-                try {
-                    return getMovies(getContentResolver().query(FavouriteMoviesContract.FavouriteEntry.CONTENT_URI,
-                            null,
-                            null,
-                            null,
-                            FavouriteMoviesContract.FavouriteEntry.COLUMN_ID_MOVIE));
-                } catch (Exception e) {
-                    Log.e(APP_TAG, CLASS_TAG + "Failed to asynchronously load data.");
-                    e.printStackTrace();
-                    return null;
-                }
-            }
-
-            private List<Movie> getMovies(Cursor c) {
-                List<Movie> list = new ArrayList<>();
-                if (c != null && c.getCount() > 0) {
-                    while (c.moveToNext()) {
-                        Movie m = new Movie();
-
-                        m.setId(c.getInt(c.getColumnIndexOrThrow(FavouriteMoviesContract.FavouriteEntry.COLUMN_ID_MOVIE)));
-                        m.setTitle(c.getString(c.getColumnIndexOrThrow(FavouriteMoviesContract.FavouriteEntry.COLUMN_MOVIE_TITLE)));
-                        m.setOriginalTitle(c.getString(c.getColumnIndexOrThrow(FavouriteMoviesContract.FavouriteEntry.COLUMN_MOVIE_ORIGINAL_TITLE)));
-                        m.setOverview(c.getString(c.getColumnIndexOrThrow(FavouriteMoviesContract.FavouriteEntry.COLUMN_MOVIE_OVERVIEW)));
-                        m.setPosterPath(c.getString(c.getColumnIndexOrThrow(FavouriteMoviesContract.FavouriteEntry.COLUMN_MOVIE_POSTER)));
-                        m.setBackdropPath(c.getString(c.getColumnIndexOrThrow(FavouriteMoviesContract.FavouriteEntry.COLUMN_MOVIE_BACKDROP)));
-                        m.setVoteAverage(c.getDouble(c.getColumnIndexOrThrow(FavouriteMoviesContract.FavouriteEntry.COLUMN_MOVIE_RATING)));
-                        m.setReleaseDate(c.getString(c.getColumnIndexOrThrow(FavouriteMoviesContract.FavouriteEntry.COLUMN_MOVIE_RELEASE_DATE)));
-
-                        list.add(m);
-                    }
-                }
-                if (c != null) {
-                    c.close();
-                }
-                return list;
+                return FavouriteDbUtils.getFavouriteMovies(MainActivity.this);
             }
         };
     }
 
     @Override
     public void onLoadFinished(Loader<List<Movie>> loader, List<Movie> data) {
-        mFavourites = data;
+        if (mCurrentMovieSort == MovieSort.FAVOURITE) {
+            mAdapter.setMovieList(data);
+            mAdapter.notifyDataSetChanged();
+        }
     }
 
     @Override

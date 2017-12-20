@@ -181,7 +181,7 @@ public class MovieDetailsAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     }
 
     private void onBindDetails(DetailsViewHolder detailsViewHolder, int position) {
-        Picasso.with(mContext).load(mMovie.getBackdropPath()).into(detailsViewHolder.getIvPoster());
+        Picasso.with(mContext).load(mMovie.getUriBackdropPath()).into(detailsViewHolder.getIvPoster());
         detailsViewHolder.getTvOriginalTitle().setText(mMovie.getOriginalTitle());
         detailsViewHolder.getTvOverview().setText(mMovie.getOverview());
         detailsViewHolder.getRbVoteAverage().setRating(mMovie.getVoteAverageFloat());
