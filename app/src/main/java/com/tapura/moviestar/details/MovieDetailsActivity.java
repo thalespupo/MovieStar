@@ -1,6 +1,8 @@
 package com.tapura.moviestar.details;
 
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
@@ -11,6 +13,7 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.tapura.moviestar.R;
 import com.tapura.moviestar.api.MoviesAPIService;
@@ -35,7 +38,7 @@ import static com.tapura.moviestar.Constants.APP_TAG;
 import static com.tapura.moviestar.Constants.KEY_MOVIE;
 import static com.tapura.moviestar.data.FavouriteContentProvider.FAVOURITE_WITH_ID;
 
-public class MovieDetailsActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Boolean> {
+public class MovieDetailsActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Boolean>, MovieDetailsAdapter.MovieDetailsOnClickHandler {
     private static final String CLASS_TAG = MovieDetailsActivity.class.getSimpleName() + ":: ";
     private static final String KEY_ITEMS_LIST = "list_items";
     private static final String KEY_IS_FAVOURITE = "is_favourite";
@@ -199,5 +202,12 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
     @Override
     public void onLoaderReset(Loader<Boolean> loader) {
 
+    }
+
+    @Override
+    public void onClick(Video video) {
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setData(Uri.parse(video.getVideoUrl()));
+        startActivity(intent);
     }
 }

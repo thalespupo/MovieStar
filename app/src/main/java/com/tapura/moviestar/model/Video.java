@@ -110,4 +110,12 @@ public class Video {
                         ",key = '" + key + '\'' +
                         "}";
     }
+
+    public String getThumbUrl() {
+        return "https://img.youtube.com/vi/" + getKey() + "/hqdefault.jpg";
+    }
+
+    public String getVideoUrl() {
+        return "https://www.youtube.com/watch?v=" + getKey();
+    }
 }

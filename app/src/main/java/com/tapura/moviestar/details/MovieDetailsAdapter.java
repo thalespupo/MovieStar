@@ -1,7 +1,6 @@
 package com.tapura.moviestar.details;
 
 
-import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -32,11 +31,15 @@ public class MovieDetailsAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     private List<Video> mVideos = new ArrayList<>();
     private List<Review> mReviews = new ArrayList<>();
 
-    private Context mContext;
+    private MovieDetailsOnClickHandler mCallback;
 
 
-    public MovieDetailsAdapter(Context context) {
-        mContext = context;
+    public MovieDetailsAdapter(MovieDetailsOnClickHandler callback) {
+        mCallback = callback;
+    }
+
+    public interface MovieDetailsOnClickHandler {
+        void onClick(Video video);
     }
 
     public void setMovie(Movie movie) {
@@ -139,8 +142,8 @@ public class MovieDetailsAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                 viewHolder = new ReviewViewHolder(v2);
                 break;
             case VIDEO:
-                View v3 = inflater.inflate(android.R.layout.simple_list_item_1, parent, false);
-                viewHolder = new VideoViewHolder(v3);
+                View v3 = inflater.inflate(R.layout.movie_video, parent, false);
+                viewHolder = new VideoViewHolder(v3, mCallback);
                 break;
             case TITLE_VIDEO:
             case TITLE_REVIEW:
@@ -181,7 +184,7 @@ public class MovieDetailsAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     }
 
     private void onBindDetails(DetailsViewHolder detailsViewHolder, int position) {
-        Picasso.with(mContext).load(mMovie.getUriBackdropPath()).into(detailsViewHolder.getIvPoster());
+        Picasso.with(detailsViewHolder.getIvPoster().getContext()).load(mMovie.getUriBackdropPath()).into(detailsViewHolder.getIvPoster());
         detailsViewHolder.getTvOriginalTitle().setText(mMovie.getOriginalTitle());
         detailsViewHolder.getTvOverview().setText(mMovie.getOverview());
         detailsViewHolder.getRbVoteAverage().setRating(mMovie.getVoteAverageFloat());
@@ -197,6 +200,8 @@ public class MovieDetailsAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     private void onBindVideo(VideoViewHolder videoViewHolder, int position) {
         Video v = mVideos.get(position);
         videoViewHolder.getTvVideoLabel().setText(v.getName());
+        Picasso.with(videoViewHolder.getTvVideoLabel().getContext()).load(v.getThumbUrl()).into(videoViewHolder.getThumbnail());
+        videoViewHolder.setVideo(v);
     }
 
     private void onBindHeader(ContentHeaderViewHolder contentHeaderViewHolder, int position) {

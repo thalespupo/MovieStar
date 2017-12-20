@@ -3,15 +3,27 @@ package com.tapura.moviestar.details;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
-public class VideoViewHolder extends RecyclerView.ViewHolder {
-    private TextView tvVideoLabel;
-    private String key;
+import com.squareup.picasso.Target;
+import com.tapura.moviestar.R;
+import com.tapura.moviestar.model.Video;
 
-    public VideoViewHolder(View itemView) {
+public class VideoViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+
+    private ImageView mThumbnail;
+    private TextView tvVideoLabel;
+    private Video mVideo;
+
+    private MovieDetailsAdapter.MovieDetailsOnClickHandler mCallBack;
+
+    public VideoViewHolder(View itemView, MovieDetailsAdapter.MovieDetailsOnClickHandler callBack) {
         super(itemView);
-        tvVideoLabel = itemView.findViewById(android.R.id.text1);
+        mThumbnail = itemView.findViewById(R.id.image_view_video_thumbnail);
+        tvVideoLabel = itemView.findViewById(R.id.text_view_video_name);
+        mCallBack = callBack;
+        itemView.setOnClickListener(this);
 
     }
 
@@ -23,11 +35,20 @@ public class VideoViewHolder extends RecyclerView.ViewHolder {
         this.tvVideoLabel = tvVideoLabel;
     }
 
-    public String getKey() {
-        return key;
+    public Video getVideo() {
+        return mVideo;
     }
 
-    public void setKey(String key) {
-        this.key = key;
+    public void setVideo(Video mVideo) {
+        this.mVideo = mVideo;
+    }
+
+    @Override
+    public void onClick(View v) {
+        mCallBack.onClick(mVideo);
+    }
+
+    public ImageView getThumbnail() {
+        return mThumbnail;
     }
 }
